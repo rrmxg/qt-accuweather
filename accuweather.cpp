@@ -1,31 +1,6 @@
 #include "accuweather.h"
 
-/*
-
-QVector<QDate> dates;
-QVector<int>   temperatureMinimum;
-QVector<int>   temperatureMaximum;
-QVector<int>   dayIconNumber;
-QStringList    dayIconNumberPhrase;
-QVector<int>   nigntIconNumber;
-QStringList    nightIconNumberPhrase;
-
-dates,
-temperatureMinimum,
-temperatureMaximum,
-dayIconNumber,
-dayIconNumberPhrase,
-nigntIconNumber,
-nightIconNumberPhrase
-
-*/
-void AccuWeather::GetWeatherDay(QVector<QDate> &dates,
-                                QVector<int>   &temperatureMinimum,
-                                QVector<int>   &temperatureMaximum,
-                                QVector<int>   &dayIconNumber,
-                                QStringList    &dayIconNumberPhrase,
-                                QVector<int>   &nigntIconNumber,
-                                QStringList    &nightIconNumberPhrase)
+void AccuWeather::GetWeatherDay(QMap<QDate, WeatherDay> &weatherDay)
 {
     LocationsAPI_AutocompleteSearch();
 
@@ -60,61 +35,38 @@ void AccuWeather::GetWeatherDay(QVector<QDate> &dates,
 
         for (const QJsonValue value : arr)
         {
-            QString _date            = value.toObject().value("Date").toString();
-            int     _temperatureMin  = value.toObject().value("Temperature").toObject().value("Minimum").toObject().value("Value").toInt();
-            int     _temperatureMax  = value.toObject().value("Temperature").toObject().value("Maximum").toObject().value("Value").toInt();
-            int     _iconDay         = value.toObject().value("Day").toObject().value("Icon").toInt();
-            QString _iconPhraseDay   = value.toObject().value("Day").toObject().value("IconPhrase").toString();
-            int     _iconNight       = value.toObject().value("Night").toObject().value("Icon").toInt();
-            QString _iconPhraseNight = value.toObject().value("Night").toObject().value("IconPhrase").toString();
+            WeatherDay wd;
 
-            qDebug() << "date            --- " << _date           ;
-            qDebug() << "temperatureMin  --- " << _temperatureMin ;
-            qDebug() << "temperatureMax  --- " << _temperatureMax ;
-            qDebug() << "iconDay         --- " << _iconDay        ;
-            qDebug() << "iconPhraseDay   --- " << _iconPhraseDay  ;
-            qDebug() << "iconNight       --- " << _iconNight      ;
-            qDebug() << "iconPhraseNight --- " << _iconPhraseNight;
+            GetDate(value.toObject().value("Date").toString());
 
-            GetDate(_date);
+            wd.dayOfWeek       = QLocale().dayName(date.dayOfWeek());
+            wd.temperatureMin  = value.toObject().value("Temperature").toObject().value("Minimum").toObject().value("Value").toInt();
+            wd.temperatureMax  = value.toObject().value("Temperature").toObject().value("Maximum").toObject().value("Value").toInt();
+            wd.iconDay         = value.toObject().value("Day").toObject().value("Icon").toInt();
+            wd.iconPhraseDay   = value.toObject().value("Day").toObject().value("IconPhrase").toString();
+            wd.iconNight       = value.toObject().value("Night").toObject().value("Icon").toInt();
+            wd.iconPhraseNight = value.toObject().value("Night").toObject().value("IconPhrase").toString();
 
-            dates                .push_back(date            );
-            temperatureMinimum   .push_back(_temperatureMin );
-            temperatureMaximum   .push_back(_temperatureMax );
-            dayIconNumber        .push_back(_iconDay        );
-            dayIconNumberPhrase  .push_back(_iconPhraseDay  );
-            nigntIconNumber      .push_back(_iconNight      );
-            nightIconNumberPhrase.push_back(_iconPhraseNight);
+            qDebug() << "date            --- " << date.toString()   ;
+            qDebug() << "dateOfWeek      --- " << wd.dayOfWeek      ;
+            qDebug() << "temperatureMin  --- " << wd.temperatureMin ;
+            qDebug() << "temperatureMax  --- " << wd.temperatureMax ;
+            qDebug() << "iconDay         --- " << wd.iconDay        ;
+            qDebug() << "iconPhraseDay   --- " << wd.iconPhraseDay  ;
+            qDebug() << "iconNight       --- " << wd.iconNight      ;
+            qDebug() << "iconPhraseNight --- " << wd.iconPhraseNight;
+
+            weatherDay[date] = wd;
         }
     }
     reply->deleteLater();
 }
 
 
-/*
-
-QVector<QTime> times;
-QVector<QDate> dates;
-QVector<bool>  isDayNight;
-QVector<int>   temperature;
-QVector<int>   weatherNumber;
-QStringList    iconNumberPhrase;
-
-times,
-dates,
-isDayNight,
-temperature,
-weatherNumber,
-iconNumberPhrase
-
-*/
-void AccuWeather::GetWeatherHour(QVector<QTime> &times,
-                                 QVector<QDate> &dates,
-                                 QVector<bool>  &isDayNight,
-                                 QVector<int>   &temperature,
-                                 QVector<int>   &weatherNumber,
-                                 QStringList    &iconNumberPhrase)
+void AccuWeather::GetWeatherHour(QMap<QTime, WeatherHour> &weatherHour)
 {
+    LocationsAPI_AutocompleteSearch();
+
     QString url
             = "http://dataservice.accuweather.com/forecasts/v1/hourly/"
             + forecastType
@@ -145,32 +97,31 @@ void AccuWeather::GetWeatherHour(QVector<QTime> &times,
 
         for (const QJsonValue value : arr)
         {
-            QString _date        = value.toObject().value("DateTime").toString();
-            int     _weatherIcon = value.toObject().value("WeatherIcon").toInt();
-            QString _iconPhrase  = value.toObject().value("IconPhrase").toString();
-            bool    _isDayNight  = value.toObject().value("IsDaylight").toBool();
-            int     _temperature = value.toObject().value("Temperature").toObject().value("Value").toInt();
+            WeatherHour wh;
 
-            qDebug() << "date        --- " << _date       ;
-            qDebug() << "weatherIcon --- " << _weatherIcon;
-            qDebug() << "iconPhrase  --- " << _iconPhrase ;
-            qDebug() << "isDayNight  --- " << _isDayNight ;
-            qDebug() << "temperature --- " << _temperature;
+            GetDate(value.toObject().value("DateTime").toString());
 
-            GetDate(_date);
+            wh.date        = date;
+            wh.dayOfWeek   = QLocale().dayName(date.dayOfWeek());
+            wh.weatherIcon = value.toObject().value("WeatherIcon").toInt();
+            wh.iconPhrase  = value.toObject().value("IconPhrase").toString();
+            wh.isDayNight  = value.toObject().value("IsDaylight").toBool();
+            wh.temperature = value.toObject().value("Temperature").toObject().value("Value").toInt();
 
-            qDebug() << "point --- 1";
+            qDebug() << "time        --- " << time.toString();
+            qDebug() << "date        --- " << wh.date        ;
+            qDebug() << "dateOfWeek  --- " << wh.dayOfWeek   ;
+            qDebug() << "weatherIcon --- " << wh.weatherIcon ;
+            qDebug() << "iconPhrase  --- " << wh.iconPhrase  ;
+            qDebug() << "isDayNight  --- " << wh.isDayNight  ;
+            qDebug() << "temperature --- " << wh.temperature ;
 
-            times           .push_back(time        );
-            dates           .push_back(date        );
-            isDayNight      .push_back(_isDayNight );
-            temperature     .push_back(_temperature);
-            weatherNumber   .push_back(_weatherIcon);
-            iconNumberPhrase.push_back(_iconPhrase );
+            weatherHour[time] = wh;
         }
     }
     reply->deleteLater();
 }
+
 
 void AccuWeather::LocationsAPI_AutocompleteSearch()
 {
@@ -212,33 +163,44 @@ void AccuWeather::LocationsAPI_AutocompleteSearch()
             qDebug() << country + "(" + administrativeArea + ") = " << key;
         }
         {
-            selectCountry.setWindowTitle(city);
-            selectCountry.SetButton(map, city);
+            selectCountry = new SelectCountry;
 
-            connect(&selectCountry, SIGNAL(SendButton(QString)), this, SLOT(GetNumber(QString)));
+            selectCountry->setWindowTitle(city);
+            selectCountry->SetButton(map, city);
 
-            selectCountry.exec();
+            connect(selectCountry, SIGNAL(SendButton(QString)), this, SLOT(GetNumber(QString)));
+
+            selectCountry->exec();
+
+            delete selectCountry;
         }
     }
     reply->deleteLater();
 }
 
+
+
 void AccuWeather::GetNumber(QString s)
 {
     key = map.find(s).value();
+    map.clear();
     qDebug() << "point --- GetNumber --- " << key;
 }
 
-void AccuWeather::GetDate(QString s)
+void AccuWeather::GetDate(const QString s)
 {
     qDebug() << "point --- GetDate";
     // yyyy-mm-ddThh:mm:ss+hh:mm;
 
     QString d = "";
-    for (int i =  0; i < 10; i++) d += s[i];
+    for (int i =  0; i < 10; i++)
+        d += s[i];
+
     date = QDate::fromString(d, "yyyy-MM-dd");
 
     QString t = "";
-    for (int i = 11; i < 19; i++) t += s[i];
+    for (int i = 11; i < 19; i++)
+        t += s[i];
+
     time = QTime::fromString(t, "HH:mm:ss");
 }

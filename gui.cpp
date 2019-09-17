@@ -20,109 +20,70 @@ GUI::~GUI()
     --- IN CASE OF FREQUENT ERRORS, YOU NEED TO DELETE THE APPLICATION AND CREATE A NEW ONE ---
 */
 
-//const QString APIKEY = "";
-//const QString CITY   = "";
+const QString APIKEY = ;
+const QString CITY   = ;
 
 void GUI::on_pushButton_show_clicked()
 {
     qDebug() << "click --- on_pushButton_show_clicked";
 
-    //    GetWeatherDay
-    QVector<QDate> dates;
-    QVector<int>   temperatureMinimum;
-    QVector<int>   temperatureMaximum;
-    QVector<int>   dayIconNumber;
-    QStringList    dayIconNumberPhrase;
-    QVector<int>   nigntIconNumber;
-    QStringList    nightIconNumberPhrase;
-
-    //    GetWeatherHour
-    QVector<QTime> times;
-    //    QVector<QDate> dates;
-    QVector<bool>  isDayNight;
-    QVector<int>   temperature;
-    QVector<int>   iconNumber;
-    QStringList    iconNumberPhrase;
+    QMap<QDate, WeatherDay>  weatherDay;
+    QMap<QTime, WeatherHour> weatherHour;
 
     AccuWeather w;
 
-    w.SetApiInfo(CITY, APIKEY, AccuWeatherAPI::FORECASTS_DAY[]);
+    w.SetApiInfo(CITY, APIKEY, FORECASTS_DAY[]);
     {
-        w.GetWeatherDay(dates,
-                        temperatureMinimum,
-                        temperatureMaximum,
-                        dayIconNumber,
-                        dayIconNumberPhrase,
-                        nigntIconNumber,
-                        nightIconNumberPhrase);
+        w.GetWeatherDay(weatherDay);
 
-        for (int i = 0; i < dates.size(); i++)
+        QMap<QDate, WeatherDay>::const_iterator it = weatherDay.constBegin();
+        while (it != weatherDay.constEnd())
         {
-            ui->textEdit->append("date            --- " +                 dates                [i].toString());
-            ui->textEdit->append("temperatureMin  --- " + QString::number(temperatureMinimum   [i]          ));
-            ui->textEdit->append("temperatureMax  --- " + QString::number(temperatureMaximum   [i]          ));
-            ui->textEdit->append("iconDay         --- " + QString::number(dayIconNumber        [i]          ));
-            ui->textEdit->append("iconPhraseDay   --- " +                 dayIconNumberPhrase  [i]           );
-            ui->textEdit->append("iconNight       --- " + QString::number(nigntIconNumber      [i]          ));
-            ui->textEdit->append("iconPhraseNight --- " +                 nightIconNumberPhrase[i]           );
+            ui->textEdit->append("date            --- " +                 it.key  ().toString()     );
+            ui->textEdit->append("dayOfWeek       --- " +                 it.value().dayOfWeek      );
+            ui->textEdit->append("temperatureMin  --- " + QString::number(it.value().temperatureMin));
+            ui->textEdit->append("temperatureMax  --- " + QString::number(it.value().temperatureMax));
+            ui->textEdit->append("iconDay         --- " + QString::number(it.value().iconDay       ));
+            ui->textEdit->append("iconPhraseDay   --- " +                 it.value().iconPhraseDay  );
+            ui->textEdit->append("iconNight       --- " + QString::number(it.value().iconNight     ));
+            ui->textEdit->append("iconPhraseNight --- " +                 it.value().iconPhraseNight);
 
             ui->textEdit->append("\n\n");
+
+             ++it;
         }
-        qDebug() << dates.size();
+        qDebug() << weatherDay.size();
     }
     {
-        qDebug() << "start clear";
+        qDebug() << "start clear --- weatherDay";
 
-        if (!dates                .isEmpty()) dates                .clear();
-        if (!temperatureMinimum   .isEmpty()) temperatureMinimum   .clear();
-        if (!temperatureMaximum   .isEmpty()) temperatureMaximum   .clear();
-        if (!dayIconNumber        .isEmpty()) dayIconNumber        .clear();
-        if (!dayIconNumberPhrase  .isEmpty()) dayIconNumberPhrase  .clear();
-        if (!nigntIconNumber      .isEmpty()) nigntIconNumber      .clear();
-        if (!nightIconNumberPhrase.isEmpty()) nightIconNumberPhrase.clear();
-        if (!times                .isEmpty()) times                .clear();
-        if (!isDayNight           .isEmpty()) isDayNight           .clear();
-        if (!temperature          .isEmpty()) temperature          .clear();
-        if (!iconNumber           .isEmpty()) iconNumber           .clear();
-        if (!iconNumberPhrase     .isEmpty()) iconNumberPhrase     .clear();
+        if (!weatherDay.isEmpty()) weatherDay.clear();
     }
 
-    w.SetApiInfo(CITY, APIKEY, AccuWeatherAPI::FORECASTS_HOUR[]);
+    w.SetApiInfo(CITY, APIKEY, FORECASTS_HOUR[]);
     {
-        w.GetWeatherHour(times,
-                         dates,
-                         isDayNight,
-                         temperature,
-                         iconNumber,
-                         iconNumberPhrase);
+        w.GetWeatherHour(weatherHour);
 
-        for (int i = 0; i < dates.size(); i++)
+        QMap<QTime, WeatherHour>::const_iterator it = weatherHour.constBegin();
+        while (it != weatherHour.constEnd())
         {
-            ui->textEdit->append("times            --- " +                 times           [i].toString());
-            ui->textEdit->append("date             --- " +                 dates           [i].toString());
-            ui->textEdit->append("isDayNight       --- " + QString::number(isDayNight      [i]          ));
-            ui->textEdit->append("tenperature      --- " + QString::number(temperature     [i]          ));
-            ui->textEdit->append("iconNumber       --- " + QString::number(iconNumber      [i]          ));
-            ui->textEdit->append("iconNumberPhrase --- " +                 iconNumberPhrase[i]           );
+            ui->textEdit->append("times       --- " +                 it.key  ().toString()     );
+            ui->textEdit->append("date        --- " +                 it.value().date.toString());
+            ui->textEdit->append("dayOfWeek   --- " +                 it.value().dayOfWeek      );
+            ui->textEdit->append("isDayNight  --- " + QString::number(it.value().isDayNight    ));
+            ui->textEdit->append("tenperature --- " + QString::number(it.value().temperature   ));
+            ui->textEdit->append("weatherIcon --- " + QString::number(it.value().weatherIcon   ));
+            ui->textEdit->append("iconPhrase  --- " +                 it.value().iconPhrase     );
 
             ui->textEdit->append("\n\n");
+
+             ++it;
         }
-        qDebug() << dates.size();
+        qDebug() << weatherHour.size();
     }
     {
-        qDebug() << "start clear";
+        qDebug() << "start clear --- weatherHour";
 
-        if (!dates                .isEmpty()) dates                .clear();
-        if (!temperatureMinimum   .isEmpty()) temperatureMinimum   .clear();
-        if (!temperatureMaximum   .isEmpty()) temperatureMaximum   .clear();
-        if (!dayIconNumber        .isEmpty()) dayIconNumber        .clear();
-        if (!dayIconNumberPhrase  .isEmpty()) dayIconNumberPhrase  .clear();
-        if (!nigntIconNumber      .isEmpty()) nigntIconNumber      .clear();
-        if (!nightIconNumberPhrase.isEmpty()) nightIconNumberPhrase.clear();
-        if (!times                .isEmpty()) times                .clear();
-        if (!isDayNight           .isEmpty()) isDayNight           .clear();
-        if (!temperature          .isEmpty()) temperature          .clear();
-        if (!iconNumber           .isEmpty()) iconNumber           .clear();
-        if (!iconNumberPhrase     .isEmpty()) iconNumberPhrase     .clear();
+        if (!weatherHour.isEmpty()) weatherHour.clear();
     }
 }

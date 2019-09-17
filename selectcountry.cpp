@@ -21,13 +21,19 @@ SelectCountry::~SelectCountry()
 void SelectCountry::SetButton(const QMap<QString, int> m, const QString cityName)
 {
     QLabel *label = new QLabel(cityName, this);
+    {
+        label->setFixedHeight(20);
+        label->setAlignment(Qt::AlignHCenter);
+    }
     ui->verticalLayout->addWidget(label);
 
     QMap<QString, int>::const_iterator it = m.constBegin();
     while (it != m.constEnd())
     {
         QPushButton *button = new QPushButton(this);
-        button->setText(it.key());
+        {
+            button->setText(it.key());
+        }
         connect(button, SIGNAL(clicked()), this, SLOT(GetButton()));
 
         ui->verticalLayout->addWidget(button);

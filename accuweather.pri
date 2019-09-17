@@ -1,3 +1,6 @@
+
+QT += network
+
 SOURCES += \
 accuweather.cpp \
 selectcountry.cpp

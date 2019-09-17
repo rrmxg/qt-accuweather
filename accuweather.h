@@ -37,6 +37,29 @@ const QStringList FORECASTS_HOUR =
     "120hour"  // 4
 };
 
+
+struct WeatherHour
+{
+    QDate   date       ;
+    QString dayOfWeek  ;
+    int     weatherIcon;
+    QString iconPhrase ;
+    bool    isDayNight ;
+    int     temperature;
+};
+
+struct WeatherDay
+{
+    QString dayOfWeek      ;
+    int     temperatureMin ;
+    int     temperatureMax ;
+    int     iconDay        ;
+    QString iconPhraseDay  ;
+    int     iconNight      ;
+    QString iconPhraseNight;
+};
+
+
 class AccuWeather : public QObject
 {
     Q_OBJECT
@@ -75,147 +98,70 @@ public:
     }
 
 
-    void GetWeatherDay(QVector<QDate> &dates,
-                       QVector<int>   &temperatureMinimum,
-                       QVector<int>   &temperatureMaximum,
-                       QVector<int>   &dayIconNumber,
-                       QStringList    &dayIconNumberPhrase,
-                       QVector<int>   &nigntIconNumber,
-                       QStringList    &nightIconNumberPhrase);
+    void GetWeatherDay(QMap<QDate, WeatherDay> &weatherDay);
 
-    void GetWeatherDay(const QString         City,
-                             QVector<QDate> &dates,
-                             QVector<int>   &temperatureMinimum,
-                             QVector<int>   &temperatureMaximum,
-                             QVector<int>   &dayIconNumber,
-                             QStringList    &dayIconNumberPhrase,
-                             QVector<int>   &nigntIconNumber,
-                             QStringList    &nightIconNumberPhrase)
+    void GetWeatherDay(const QString City,
+                             QMap<QDate, WeatherDay> &weatherDay)
     {
         city = City;
 
-        GetWeatherDay(dates,
-                      temperatureMinimum,
-                      temperatureMaximum,
-                      dayIconNumber,
-                      dayIconNumberPhrase,
-                      nigntIconNumber,
-                      nightIconNumberPhrase);
+        GetWeatherDay(weatherDay);
     }
 
-    void GetWeatherDay(const QString         City,
-                       const QString         ForecastType,
-                             QVector<QDate> &dates,
-                             QVector<int>   &temperatureMinimum,
-                             QVector<int>   &temperatureMaximum,
-                             QVector<int>   &dayIconNumber,
-                             QStringList    &dayIconNumberPhrase,
-                             QVector<int>   &nigntIconNumber,
-                             QStringList    &nightIconNumberPhrase)
+    void GetWeatherDay(const QString City,
+                       const QString ForecastType,
+                             QMap<QDate, WeatherDay> &weatherDay)
     {
         city         = City;
         forecastType = ForecastType;
 
-        GetWeatherDay(dates,
-                      temperatureMinimum,
-                      temperatureMaximum,
-                      dayIconNumber,
-                      dayIconNumberPhrase,
-                      nigntIconNumber,
-                      nightIconNumberPhrase);
+        GetWeatherDay(weatherDay);
     }
 
-    void GetWeatherDay(const QString         City,
-                       const QString         ApiKey,
-                       const QString         ForecastType,
-                             QVector<QDate> &dates,
-                             QVector<int>   &temperatureMinimum,
-                             QVector<int>   &temperatureMaximum,
-                             QVector<int>   &dayIconNumber,
-                             QStringList    &dayIconNumberPhrase,
-                             QVector<int>   &nigntIconNumber,
-                             QStringList    &nightIconNumberPhrase)
+    void GetWeatherDay(const QString City,
+                       const QString ApiKey,
+                       const QString ForecastType,
+                             QMap<QDate, WeatherDay> &weatherDay)
     {
         city         = City;
         apiKey       = ApiKey;
         forecastType = ForecastType;
 
-        GetWeatherDay(dates,
-                      temperatureMinimum,
-                      temperatureMaximum,
-                      dayIconNumber,
-                      dayIconNumberPhrase,
-                      nigntIconNumber,
-                      nightIconNumberPhrase);
+        GetWeatherDay(weatherDay);
     }
 
 
 
-    void GetWeatherHour(QVector<QTime> &times,
-                        QVector<QDate> &dates,
-                        QVector<bool>  &isDayNight,
-                        QVector<int>   &temperature,
-                        QVector<int>   &weatherNumber,
-                        QStringList    &iconNumberPhrase);
+    void GetWeatherHour(QMap<QTime, WeatherHour> &weatherHour);
 
-    void GetWeatherHour(const QString         City,
-                              QVector<QTime> &times,
-                              QVector<QDate> &dates,
-                              QVector<bool>  &isDayNight,
-                              QVector<int>   &temperature,
-                              QVector<int>   &weatherNumber,
-                              QStringList    &iconNumberPhrase)
+    void GetWeatherHour(const QString City,
+                              QMap<QTime, WeatherHour> &weatherHour)
     {
         city = City;
 
-        GetWeatherHour(times,
-                       dates,
-                       isDayNight,
-                       temperature,
-                       weatherNumber,
-                       iconNumberPhrase);
+        GetWeatherHour(weatherHour);
     }
 
-    void GetWeatherHour(const QString         City,
-                        const QString         ForecastType,
-                              QVector<QTime> &times,
-                              QVector<QDate> &dates,
-                              QVector<bool>  &isDayNight,
-                              QVector<int>   &temperature,
-                              QVector<int>   &weatherNumber,
-                              QStringList    &iconNumberPhrase)
+    void GetWeatherHour(const QString City,
+                        const QString ForecastType,
+                              QMap<QTime, WeatherHour> &weatherHour)
     {
         city         = City;
         forecastType = ForecastType;
 
-        GetWeatherHour(times,
-                       dates,
-                       isDayNight,
-                       temperature,
-                       weatherNumber,
-                       iconNumberPhrase);
+        GetWeatherHour(weatherHour);
     }
 
-    void GetWeatherHour(const QString         City,
-                        const QString         ApiKey,
-                        const QString         ForecastType,
-                              QVector<QTime> &times,
-                              QVector<QDate> &dates,
-                              QVector<bool>  &isDayNight,
-                              QVector<int>   &temperature,
-                              QVector<int>   &weatherNumber,
-                              QStringList    &iconNumberPhrase)
+    void GetWeatherHour(const QString City,
+                        const QString ApiKey,
+                        const QString ForecastType,
+                              QMap<QTime, WeatherHour> &weatherHour)
     {
         city         = City;
         apiKey       = ApiKey;
         forecastType = ForecastType;
 
-        GetWeatherHour(times,
-                       dates,
-                       isDayNight,
-                       temperature,
-                       weatherNumber,
-                       iconNumberPhrase);
+        GetWeatherHour(weatherHour);
     }
 
 public slots:
@@ -237,7 +183,7 @@ private:
 
     void GetDate(const QString d);
 
-    SelectCountry selectCountry;
+    SelectCountry *selectCountry;
 };
 
 #endif // ACCUWEATHER_WEATHER_H
