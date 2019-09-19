@@ -16,8 +16,7 @@ GUI::~GUI()
 }
 
 /*
-    --- THE SERVICE HAS A LIMITED NUMBER OF REQUESTS FOR THE APPLICATION ---
-    --- IN CASE OF FREQUENT ERRORS, YOU NEED TO DELETE THE APPLICATION AND CREATE A NEW ONE ---
+    --- SERVICE IN TRIAL MODE HAS A LIMITED NUMBER OF REQUESTS TO THE APPLICATION ---
 */
 
 const QString APIKEY = ;
@@ -25,65 +24,55 @@ const QString CITY   = ;
 
 void GUI::on_pushButton_show_clicked()
 {
-    qDebug() << "click --- on_pushButton_show_clicked";
+    QMap<QDate, WeatherDay>  weatherDays;
+    QMap<QTime, WeatherHour> weatherHours;
 
-    QMap<QDate, WeatherDay>  weatherDay;
-    QMap<QTime, WeatherHour> weatherHour;
+    AccuWeather accuWeather;
 
-    AccuWeather w;
-
-    w.SetApiInfo(CITY, APIKEY, FORECASTS_DAY[]);
+    accuWeather.setData(CITY, APIKEY, FORECASTS_DAYS[]);
     {
-        w.GetWeatherDay(weatherDay);
+        accuWeather.getData(weatherDays);
 
-        QMap<QDate, WeatherDay>::const_iterator it = weatherDay.constBegin();
-        while (it != weatherDay.constEnd())
+        QMap<QDate, WeatherDay>::const_iterator it = weatherDays.constBegin();
+        while (it != weatherDays.constEnd())
         {
             ui->textEdit->append("date            --- " +                 it.key  ().toString()     );
             ui->textEdit->append("dayOfWeek       --- " +                 it.value().dayOfWeek      );
             ui->textEdit->append("temperatureMin  --- " + QString::number(it.value().temperatureMin));
             ui->textEdit->append("temperatureMax  --- " + QString::number(it.value().temperatureMax));
-            ui->textEdit->append("iconDay         --- " + QString::number(it.value().iconDay       ));
+            ui->textEdit->append("iconDayNo       --- " + QString::number(it.value().iconDayNo     ));
             ui->textEdit->append("iconPhraseDay   --- " +                 it.value().iconPhraseDay  );
-            ui->textEdit->append("iconNight       --- " + QString::number(it.value().iconNight     ));
+            ui->textEdit->append("iconNightNo     --- " + QString::number(it.value().iconNightNo   ));
             ui->textEdit->append("iconPhraseNight --- " +                 it.value().iconPhraseNight);
 
             ui->textEdit->append("\n\n");
 
              ++it;
         }
-        qDebug() << weatherDay.size();
-    }
-    {
-        qDebug() << "start clear --- weatherDay";
-
-        if (!weatherDay.isEmpty()) weatherDay.clear();
+        if (!weatherDays.isEmpty())
+            weatherDays.clear();
     }
 
-    w.SetApiInfo(CITY, APIKEY, FORECASTS_HOUR[]);
+    accuWeather.setData(CITY, APIKEY, FORECASTS_HOURS[]);
     {
-        w.GetWeatherHour(weatherHour);
+        accuWeather.getData(weatherHours);
 
-        QMap<QTime, WeatherHour>::const_iterator it = weatherHour.constBegin();
-        while (it != weatherHour.constEnd())
+        QMap<QTime, WeatherHour>::const_iterator it = weatherHours.constBegin();
+        while (it != weatherHours.constEnd())
         {
             ui->textEdit->append("times       --- " +                 it.key  ().toString()     );
             ui->textEdit->append("date        --- " +                 it.value().date.toString());
             ui->textEdit->append("dayOfWeek   --- " +                 it.value().dayOfWeek      );
             ui->textEdit->append("isDayNight  --- " + QString::number(it.value().isDayNight    ));
             ui->textEdit->append("tenperature --- " + QString::number(it.value().temperature   ));
-            ui->textEdit->append("weatherIcon --- " + QString::number(it.value().weatherIcon   ));
+            ui->textEdit->append("iconNo      --- " + QString::number(it.value().iconNo        ));
             ui->textEdit->append("iconPhrase  --- " +                 it.value().iconPhrase     );
 
             ui->textEdit->append("\n\n");
 
              ++it;
         }
-        qDebug() << weatherHour.size();
-    }
-    {
-        qDebug() << "start clear --- weatherHour";
-
-        if (!weatherHour.isEmpty()) weatherHour.clear();
+        if (!weatherHours.isEmpty())
+            weatherHours.clear();
     }
 }

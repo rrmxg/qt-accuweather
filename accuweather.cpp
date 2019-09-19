@@ -1,18 +1,16 @@
 #include "accuweather.h"
 
-void AccuWeather::GetWeatherDay(QMap<QDate, WeatherDay> &weatherDay)
+void AccuWeather::getData(QMap<QDate, WeatherDay> &_weatherDays)
 {
-    LocationsAPI_AutocompleteSearch();
+    getLocationKey();
 
     QString url
             = "http://dataservice.accuweather.com/forecasts/v1/daily/"
-            + forecastType
+            + aw_forecastType
             + "/"
-            + QString::number(key)
+            + QString::number(aw_locationKey)
             + "?apikey="
-            + apiKey;
-
-    qDebug() << "url --- GetWeatherDay --- " << url;
+            + aw_apiKey;
 
     QNetworkAccessManager networkAccessManager;
     QEventLoop            eventLoop;
@@ -25,7 +23,7 @@ void AccuWeather::GetWeatherDay(QMap<QDate, WeatherDay> &weatherDay)
 
     if (reply->error())
     {
-        qDebug() << "error --- GetWeatherDay";
+        qDebug() << "error getData <Day>";
     }
     else
     {
@@ -35,47 +33,44 @@ void AccuWeather::GetWeatherDay(QMap<QDate, WeatherDay> &weatherDay)
 
         for (const QJsonValue value : arr)
         {
-            WeatherDay wd;
+            WeatherDay weatherDay;
 
-            GetDate(value.toObject().value("Date").toString());
+            getDateTime(value.toObject().value("Date").toString());
 
-            wd.dayOfWeek       = QLocale().dayName(date.dayOfWeek());
-            wd.temperatureMin  = value.toObject().value("Temperature").toObject().value("Minimum").toObject().value("Value").toInt();
-            wd.temperatureMax  = value.toObject().value("Temperature").toObject().value("Maximum").toObject().value("Value").toInt();
-            wd.iconDay         = value.toObject().value("Day").toObject().value("Icon").toInt();
-            wd.iconPhraseDay   = value.toObject().value("Day").toObject().value("IconPhrase").toString();
-            wd.iconNight       = value.toObject().value("Night").toObject().value("Icon").toInt();
-            wd.iconPhraseNight = value.toObject().value("Night").toObject().value("IconPhrase").toString();
+            weatherDay.dayOfWeek       = QLocale().dayName(aw_date.dayOfWeek());
+            weatherDay.temperatureMin  = value.toObject().value("Temperature")
+                                              .toObject().value("Minimum")
+                                              .toObject().value("Value").toInt();
+            weatherDay.temperatureMax  = value.toObject().value("Temperature")
+                                              .toObject().value("Maximum")
+                                              .toObject().value("Value").toInt();
+            weatherDay.iconDayNo       = value.toObject().value("Day")
+                                              .toObject().value("Icon").toInt();
+            weatherDay.iconPhraseDay   = value.toObject().value("Day")
+                                              .toObject().value("IconPhrase").toString();
+            weatherDay.iconNightNo     = value.toObject().value("Night")
+                                              .toObject().value("Icon").toInt();
+            weatherDay.iconPhraseNight = value.toObject().value("Night")
+                                              .toObject().value("IconPhrase").toString();
 
-            qDebug() << "date            --- " << date.toString()   ;
-            qDebug() << "dateOfWeek      --- " << wd.dayOfWeek      ;
-            qDebug() << "temperatureMin  --- " << wd.temperatureMin ;
-            qDebug() << "temperatureMax  --- " << wd.temperatureMax ;
-            qDebug() << "iconDay         --- " << wd.iconDay        ;
-            qDebug() << "iconPhraseDay   --- " << wd.iconPhraseDay  ;
-            qDebug() << "iconNight       --- " << wd.iconNight      ;
-            qDebug() << "iconPhraseNight --- " << wd.iconPhraseNight;
-
-            weatherDay[date] = wd;
+            _weatherDays[aw_date] = weatherDay;
         }
     }
     reply->deleteLater();
 }
 
 
-void AccuWeather::GetWeatherHour(QMap<QTime, WeatherHour> &weatherHour)
+void AccuWeather::getData(QMap<QTime, WeatherHour> &_weatherHours)
 {
-    LocationsAPI_AutocompleteSearch();
+    getLocationKey();
 
     QString url
             = "http://dataservice.accuweather.com/forecasts/v1/hourly/"
-            + forecastType
+            + aw_forecastType
             + "/"
-            + QString::number(key)
+            + QString::number(aw_locationKey)
             + "?apikey="
-            + apiKey;
-
-    qDebug() << "url --- GetWeatherHour --- " << url;
+            + aw_apiKey;
 
     QNetworkAccessManager networkAccessManager;
     QEventLoop            eventLoop;
@@ -88,7 +83,7 @@ void AccuWeather::GetWeatherHour(QMap<QTime, WeatherHour> &weatherHour)
 
     if (reply->error())
     {
-        qDebug() << "error --- GetWeatherHour";
+        qDebug() << "error getData <Hour>";
     }
     else
     {
@@ -97,41 +92,32 @@ void AccuWeather::GetWeatherHour(QMap<QTime, WeatherHour> &weatherHour)
 
         for (const QJsonValue value : arr)
         {
-            WeatherHour wh;
+            WeatherHour weatherHour;
 
-            GetDate(value.toObject().value("DateTime").toString());
+            getDateTime(value.toObject().value("DateTime").toString());
 
-            wh.date        = date;
-            wh.dayOfWeek   = QLocale().dayName(date.dayOfWeek());
-            wh.weatherIcon = value.toObject().value("WeatherIcon").toInt();
-            wh.iconPhrase  = value.toObject().value("IconPhrase").toString();
-            wh.isDayNight  = value.toObject().value("IsDaylight").toBool();
-            wh.temperature = value.toObject().value("Temperature").toObject().value("Value").toInt();
+            weatherHour.date        = aw_date;
+            weatherHour.dayOfWeek   = QLocale().dayName(aw_date.dayOfWeek());
+            weatherHour.iconNo      = value.toObject().value("WeatherIcon").toInt();
+            weatherHour.iconPhrase  = value.toObject().value("IconPhrase").toString();
+            weatherHour.isDayNight  = value.toObject().value("IsDaylight").toBool();
+            weatherHour.temperature = value.toObject().value("Temperature")
+                                              .toObject().value("Value").toInt();
 
-            qDebug() << "time        --- " << time.toString();
-            qDebug() << "date        --- " << wh.date        ;
-            qDebug() << "dateOfWeek  --- " << wh.dayOfWeek   ;
-            qDebug() << "weatherIcon --- " << wh.weatherIcon ;
-            qDebug() << "iconPhrase  --- " << wh.iconPhrase  ;
-            qDebug() << "isDayNight  --- " << wh.isDayNight  ;
-            qDebug() << "temperature --- " << wh.temperature ;
-
-            weatherHour[time] = wh;
+            _weatherHours[aw_time] = weatherHour;
         }
     }
     reply->deleteLater();
 }
 
 
-void AccuWeather::LocationsAPI_AutocompleteSearch()
+void AccuWeather::getLocationKey()
 {
     QString url
             =  "http://dataservice.accuweather.com/locations/v1/cities/autocomplete?apikey="
-            + apiKey
+            + aw_apiKey
             + "&q="
-            + city;
-
-    qDebug() << "url --- LocationsAPI_AutocompleteSearch --- " << url;
+            + aw_city;
 
     QNetworkAccessManager networkAccessManager;
     QEventLoop            eventLoop;
@@ -144,7 +130,7 @@ void AccuWeather::LocationsAPI_AutocompleteSearch()
 
     if (reply->error())
     {
-        qDebug() << "error --- LocationsAPI_AutocompleteSearch";
+        qDebug() << "error getLocationKey";
     }
     else
     {
@@ -153,22 +139,22 @@ void AccuWeather::LocationsAPI_AutocompleteSearch()
 
         for (const QJsonValue value : arr)
         {
-            QString country = value.toObject().value("Country").toObject().value("LocalizedName").toString();
-            QString administrativeArea
-                            = value.toObject().value("AdministrativeArea").toObject().value("LocalizedName").toString();
             QString key     = value.toObject().value("Key").toString();
+            QString country = value.toObject().value("Country")
+                                   .toObject().value("LocalizedName").toString();
+            QString administrativeArea
+                            = value.toObject().value("AdministrativeArea")
+                                   .toObject().value("LocalizedName").toString();
 
-            countries[country + "(" + administrativeArea + ")"] = key.toInt();
-
-            qDebug() << country + "(" + administrativeArea + ") = " << key;
+            aw_countries[country + "(" + administrativeArea + ")"] = key.toInt();
         }
         {
-            selectCountry = new SelectCountry;
+            SelectCountry *selectCountry = new SelectCountry;
 
-            selectCountry->setWindowTitle(city);
-            selectCountry->SetButton(countries, city);
+            selectCountry->setWindowTitle(aw_city);
+            selectCountry->instButtons(aw_countries, aw_city);
 
-            connect(selectCountry, SIGNAL(SendButton(QString)), this, SLOT(GetNumber(QString)));
+            connect(selectCountry, SIGNAL(sendButtonText(const QString)), this, SLOT(getButtonText(const QString)));
 
             selectCountry->exec();
 
@@ -180,27 +166,25 @@ void AccuWeather::LocationsAPI_AutocompleteSearch()
 
 
 
-void AccuWeather::GetNumber(QString s)
+void AccuWeather::getButtonText(const QString _s)
 {
-    key = countries.find(s).value();
-    countries.clear();
-    qDebug() << "point --- GetNumber --- " << key;
+    aw_locationKey = aw_countries.find(_s).value();
+    aw_countries.clear();
 }
 
-void AccuWeather::GetDate(const QString s)
+void AccuWeather::getDateTime(const QString _date)
 {
-    qDebug() << "point --- GetDate";
     // yyyy-mm-ddThh:mm:ss+hh:mm;
 
-    QString d = "";
+    QString d{};
     for (int i =  0; i < 10; i++)
-        d += s[i];
+        d += _date[i];
 
-    date = QDate::fromString(d, "yyyy-MM-dd");
+    aw_date = QDate::fromString(d, "yyyy-MM-dd");
 
-    QString t = "";
+    QString t{};
     for (int i = 11; i < 19; i++)
-        t += s[i];
+        t += _date[i];
 
-    time = QTime::fromString(t, "HH:mm:ss");
+    aw_time = QTime::fromString(t, "HH:mm:ss");
 }

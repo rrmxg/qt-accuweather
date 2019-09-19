@@ -20,21 +20,21 @@
 
 const QString ACCUWEATHER = "AccuWeather";
 
-const QStringList FORECASTS_DAY =
+const QStringList FORECASTS_DAYS =
 {
     "1day",    // 0
     "5day",    // 1
-    "10day",   // 2
-    "15day"    // 3
+    "10day",   // 2 -
+    "15day"    // 3 -
 };
 
-const QStringList FORECASTS_HOUR =
+const QStringList FORECASTS_HOURS =
 {
     "1hour",   // 0
     "12hour",  // 1
-    "24hour",  // 2
-    "72hour",  // 3
-    "120hour"  // 4
+    "24hour",  // 2 -
+    "72hour",  // 3 -
+    "120hour"  // 4 -
 };
 
 
@@ -42,7 +42,7 @@ struct WeatherHour
 {
     QDate   date       ;
     QString dayOfWeek  ;
-    int     weatherIcon;
+    int     iconNo     ;
     QString iconPhrase ;
     bool    isDayNight ;
     int     temperature;
@@ -53,9 +53,9 @@ struct WeatherDay
     QString dayOfWeek      ;
     int     temperatureMin ;
     int     temperatureMax ;
-    int     iconDay        ;
+    int     iconDayNo      ;
     QString iconPhraseDay  ;
-    int     iconNight      ;
+    int     iconNightNo    ;
     QString iconPhraseNight;
 };
 
@@ -67,123 +67,120 @@ class AccuWeather : public QObject
 public:
     AccuWeather() {}
 
-    AccuWeather(const QString ApiKey) :
-        apiKey(ApiKey) {}
+    AccuWeather(const QString _apiKey) :
+        aw_apiKey(_apiKey) {}
 
-    AccuWeather(const QString ApiKey,
-                const QString ForecastType) :
-        apiKey      (ApiKey),
-        forecastType(ForecastType) {}
+    AccuWeather(const QString _apiKey,
+                const QString _forecastType) :
+        aw_apiKey      (_apiKey),
+        aw_forecastType(_forecastType) {}
 
-    AccuWeather(const QString City,
-                const QString ApiKey,
-                const QString ForecastType) :
-        city        (City),
-        apiKey      (ApiKey),
-        forecastType(ForecastType) {}
+    AccuWeather(const QString _city,
+                const QString _apiKey,
+                const QString _forecastType) :
+        aw_city        (_city),
+        aw_apiKey      (_apiKey),
+        aw_forecastType(_forecastType) {}
 
     ~AccuWeather() {}
 
-    void SetCity        (const QString City)         { city         = City;         }
-    void SetApiKey      (const QString ApiKey)       { apiKey       = ApiKey;       }
-    void SetForecastType(const QString ForecastType) { forecastType = ForecastType; }
+    void setCity        (const QString _city)         { aw_city         = _city;         }
+    void setApiKey      (const QString _apiKey)       { aw_apiKey       = _apiKey;       }
+    void setForecastType(const QString _forecastType) { aw_forecastType = _forecastType; }
 
-    void SetApiInfo(const QString City,
-                    const QString ApiKey,
-                    const QString ForecastType)
+    void setData(const QString _city,
+                 const QString _apiKey,
+                 const QString _forecastType)
     {
-        city         = City;
-        apiKey       = ApiKey;
-        forecastType = ForecastType;
+        aw_city         = _city;
+        aw_apiKey       = _apiKey;
+        aw_forecastType = _forecastType;
     }
 
 
-    void GetWeatherDay(QMap<QDate, WeatherDay> &weatherDay);
+    void getData(QMap<QDate, WeatherDay> &_weatherDays);
 
-    void GetWeatherDay(const QString City,
-                             QMap<QDate, WeatherDay> &weatherDay)
+    void getData(const QString _city,
+                       QMap<QDate, WeatherDay> &_weatherDays)
     {
-        city = City;
+        aw_city = _city;
 
-        GetWeatherDay(weatherDay);
+        getData(_weatherDays);
     }
 
-    void GetWeatherDay(const QString City,
-                       const QString ForecastType,
-                             QMap<QDate, WeatherDay> &weatherDay)
+    void getData(const QString _city,
+                 const QString _forecastType,
+                       QMap<QDate, WeatherDay> &_weatherDays)
     {
-        city         = City;
-        forecastType = ForecastType;
+        aw_city         = _city;
+        aw_forecastType = _forecastType;
 
-        GetWeatherDay(weatherDay);
+        getData(_weatherDays);
     }
 
-    void GetWeatherDay(const QString City,
-                       const QString ApiKey,
-                       const QString ForecastType,
-                             QMap<QDate, WeatherDay> &weatherDay)
+    void getData(const QString _city,
+                 const QString _apiKey,
+                 const QString _forecastType,
+                       QMap<QDate, WeatherDay> &_weatherDays)
     {
-        city         = City;
-        apiKey       = ApiKey;
-        forecastType = ForecastType;
+        aw_city         = _city;
+        aw_apiKey       = _apiKey;
+        aw_forecastType = _forecastType;
 
-        GetWeatherDay(weatherDay);
+        getData(_weatherDays);
     }
 
 
 
-    void GetWeatherHour(QMap<QTime, WeatherHour> &weatherHour);
+    void getData(QMap<QTime, WeatherHour> &_weatherHours);
 
-    void GetWeatherHour(const QString City,
-                              QMap<QTime, WeatherHour> &weatherHour)
+    void getData(const QString _city,
+                       QMap<QTime, WeatherHour> &_weatherHours)
     {
-        city = City;
+        aw_city = _city;
 
-        GetWeatherHour(weatherHour);
+        getData(_weatherHours);
     }
 
-    void GetWeatherHour(const QString City,
-                        const QString ForecastType,
-                              QMap<QTime, WeatherHour> &weatherHour)
+    void getData(const QString _city,
+                 const QString _forecastType,
+                       QMap<QTime, WeatherHour> &weatherHours)
     {
-        city         = City;
-        forecastType = ForecastType;
+        aw_city         = _city;
+        aw_forecastType = _forecastType;
 
-        GetWeatherHour(weatherHour);
+        getData(weatherHours);
     }
 
-    void GetWeatherHour(const QString City,
-                        const QString ApiKey,
-                        const QString ForecastType,
-                              QMap<QTime, WeatherHour> &weatherHour)
+    void getData(const QString _city,
+                 const QString _apiKey,
+                 const QString _forecastType,
+                       QMap<QTime, WeatherHour> &_weatherHours)
     {
-        city         = City;
-        apiKey       = ApiKey;
-        forecastType = ForecastType;
+        aw_city         = _city;
+        aw_apiKey       = _apiKey;
+        aw_forecastType = _forecastType;
 
-        GetWeatherHour(weatherHour);
+        getData(_weatherHours);
     }
 
 public slots:
-    void GetNumber(QString);
+    void getButtonText(const QString);
 
 private:
-    QString city;
-    QString apiKey;
-    QString forecastType;
+    QString aw_city        {};
+    QString aw_apiKey      {};
+    QString aw_forecastType{};
 
-    int key;
+    int aw_locationKey{};
 
-    QMap<QString, int> countries;
+    QMap<QString, int> aw_countries{};
 
-    void LocationsAPI_AutocompleteSearch();
+    QDate aw_date{};
+    QTime aw_time{};
 
-    QDate date;
-    QTime time;
-
-    void GetDate(const QString d);
-
-    SelectCountry *selectCountry;
+    void getLocationKey();                   // LocationsAPI -> AutocompleteSearch
+    void getDateTime   (const QString _date);
 };
 
 #endif // ACCUWEATHER_WEATHER_H

@@ -7,17 +7,18 @@ class SelectCountry : public QDialog
 {
     Q_OBJECT
 
+signals:
+    void sendButtonText(const QString);
+
 public:
     explicit SelectCountry(QWidget *parent = nullptr);
     ~SelectCountry() {}
 
-    void SetButton(const QMap<QString, int> countries, const QString cityName);
+    void instButtons(const QMap<QString, int> _countries,
+                     const QString            _cityName);
 
-signals:
-    void SendButton(QString);
-
-public slots:
-    void GetButton();
+private slots:
+    void on_pushButton_clicked();
 
 private:
 };

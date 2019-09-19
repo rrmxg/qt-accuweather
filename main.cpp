@@ -6,9 +6,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    GUI w;
-    w.setWindowTitle("Weather");
-    w.show();
+    GUI gui;
+    gui.setWindowTitle("Weather");
+    gui.show();
 
     return a.exec();
 }
