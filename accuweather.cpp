@@ -158,7 +158,7 @@ void AccuWeather::LocationsAPI_AutocompleteSearch()
                             = value.toObject().value("AdministrativeArea").toObject().value("LocalizedName").toString();
             QString key     = value.toObject().value("Key").toString();
 
-            map[country + "(" + administrativeArea + ")"] = key.toInt();
+            countries[country + "(" + administrativeArea + ")"] = key.toInt();
 
             qDebug() << country + "(" + administrativeArea + ") = " << key;
         }
@@ -166,7 +166,7 @@ void AccuWeather::LocationsAPI_AutocompleteSearch()
             selectCountry = new SelectCountry;
 
             selectCountry->setWindowTitle(city);
-            selectCountry->SetButton(map, city);
+            selectCountry->SetButton(countries, city);
 
             connect(selectCountry, SIGNAL(SendButton(QString)), this, SLOT(GetNumber(QString)));
 
@@ -182,8 +182,8 @@ void AccuWeather::LocationsAPI_AutocompleteSearch()
 
 void AccuWeather::GetNumber(QString s)
 {
-    key = map.find(s).value();
-    map.clear();
+    key = countries.find(s).value();
+    countries.clear();
     qDebug() << "point --- GetNumber --- " << key;
 }
 

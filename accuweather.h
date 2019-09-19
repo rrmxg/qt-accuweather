@@ -174,7 +174,7 @@ private:
 
     int key;
 
-    QMap<QString, int> map;
+    QMap<QString, int> countries;
 
     void LocationsAPI_AutocompleteSearch();
 

@@ -1,34 +1,29 @@
 #include "selectcountry.h"
-#include "ui_selectcountry.h"
 
 #include <QPushButton>
 #include <QLabel>
+#include <QVBoxLayout>
 
 #include <QDebug>
 
 SelectCountry::SelectCountry(QWidget *parent) :
-    QDialog(parent, Qt::Window | Qt::FramelessWindowHint),
-    ui(new Ui::SelectCountry)
-{
-    ui->setupUi(this);
-}
+    QDialog(parent, Qt::Window | Qt::FramelessWindowHint) { }
 
-SelectCountry::~SelectCountry()
-{
-    delete ui;
-}
 
-void SelectCountry::SetButton(const QMap<QString, int> m, const QString cityName)
+void SelectCountry::SetButton(const QMap<QString, int> countries, const QString cityName)
 {
+    QVBoxLayout *verticalLayout = new QVBoxLayout(this);
+    setLayout(verticalLayout);
+
     QLabel *label = new QLabel(cityName, this);
     {
         label->setFixedHeight(20);
         label->setAlignment(Qt::AlignHCenter);
     }
-    ui->verticalLayout->addWidget(label);
+    verticalLayout->addWidget(label);
 
-    QMap<QString, int>::const_iterator it = m.constBegin();
-    while (it != m.constEnd())
+    QMap<QString, int>::const_iterator it = countries.constBegin();
+    while (it != countries.constEnd())
     {
         QPushButton *button = new QPushButton(this);
         {
@@ -36,11 +31,12 @@ void SelectCountry::SetButton(const QMap<QString, int> m, const QString cityName
         }
         connect(button, SIGNAL(clicked()), this, SLOT(GetButton()));
 
-        ui->verticalLayout->addWidget(button);
+        verticalLayout->addWidget(button);
         ++it;
     }
     qDebug() << "selecttttt";
 }
+
 
 void SelectCountry::GetButton()
 {
