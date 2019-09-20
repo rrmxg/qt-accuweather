@@ -1,35 +1,45 @@
+///////////////////////////////////////////////////////////////////////////////
 #include "accuweather.h"
-
-void AccuWeather::getData(QMap<QDate, WeatherDay> &weatherDays)
+///////////////////////////////////////////////////////////////////////////////
+#include <QDebug>
+///////////////////////////////////////////////////////////////////////////////
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QNetworkReply>
+#include <QEventLoop>
+///////////////////////////////////////////////////////////////////////////////
+#include <QPushButton>
+#include <QLabel>
+#include <QVBoxLayout>
+///////////////////////////////////////////////////////////////////////////////
+bool AccuWeather::getForecast(const QString forecastType,
+                                    QMap<QDate, WeatherDay> &weatherDays)
 {
-    getLocationKey();
-
-    QString url
-            = "http://dataservice.accuweather.com/forecasts/v1/daily/"
-            + aw_forecastType
-            + "/"
-            + QString::number(aw_locationKey)
-            + "?apikey="
-            + aw_apiKey;
-
-    QNetworkAccessManager networkAccessManager;
-    QEventLoop            eventLoop;
-
-    QObject::connect(&networkAccessManager, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
-
-    QNetworkReply *reply = networkAccessManager.get(QNetworkRequest(QUrl(url)));
-
-    eventLoop.exec();
-
-    if (reply->error())
+    if (aw_locationKey == 0)
     {
-        qDebug() << "error getData <Day>";
+        qDebug() << "error --- aw_locationKey = 0";
+        return false;
     }
-    else
     {
-        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-        QJsonObject   obj = doc.object();
-        QJsonArray    arr = obj.value("DailyForecasts").toArray();
+        QString url
+                = "http://dataservice.accuweather.com/forecasts/v1/daily/"
+                + forecastType
+                + "/"
+                + QString::number(aw_locationKey)
+                + "?apikey="
+                + aw_apiKey;
+
+        getData(url);
+
+        if (url == "error")
+        {
+            qDebug() << "error --- getForecast <Days>";
+            return false;
+        }
+    }
+    {
+        QJsonObject obj = doc.object();
+        QJsonArray  arr = obj.value("DailyForecasts").toArray();
 
         for (const QJsonValue value : arr)
         {
@@ -58,39 +68,36 @@ void AccuWeather::getData(QMap<QDate, WeatherDay> &weatherDays)
             weatherDays[aw_date] = weatherDay;
         }
     }
-    reply->deleteLater();
+    return true;
 }
 
-
-void AccuWeather::getData(QMap<QTime, WeatherHour> &weatherHours)
+bool AccuWeather::getForecast(const QString forecastType,
+                                    QMap<QTime, WeatherHour> &weatherHours)
 {
-    getLocationKey();
-
-    QString url
-            = "http://dataservice.accuweather.com/forecasts/v1/hourly/"
-            + aw_forecastType
-            + "/"
-            + QString::number(aw_locationKey)
-            + "?apikey="
-            + aw_apiKey;
-
-    QNetworkAccessManager networkAccessManager;
-    QEventLoop            eventLoop;
-
-    QObject::connect(&networkAccessManager, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
-
-    QNetworkReply *reply = networkAccessManager.get(QNetworkRequest(QUrl(url)));
-
-    eventLoop.exec();
-
-    if (reply->error())
+    if (aw_locationKey == 0)
     {
-        qDebug() << "error getData <Hour>";
+        qDebug() << "error --- aw_locationKey = 0";
+        return false;
     }
-    else
     {
-        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-        QJsonArray    arr = doc.array();
+        QString url
+                = "http://dataservice.accuweather.com/forecasts/v1/hourly/"
+                + forecastType
+                + "/"
+                + QString::number(aw_locationKey)
+                + "?apikey="
+                + aw_apiKey;
+
+        getData(url);
+
+        if (url == "error")
+        {
+            qDebug() << "error --- getForecast <Hours>";
+            return false;
+        }
+    }
+    {
+        QJsonArray arr = doc.array();
 
         for (const QJsonValue value : arr)
         {
@@ -110,18 +117,86 @@ void AccuWeather::getData(QMap<QTime, WeatherHour> &weatherHours)
             weatherHours[aw_time] = weatherHour;
         }
     }
-    reply->deleteLater();
+    return true;
 }
 
-
-void AccuWeather::getLocationKey()
+bool AccuWeather::getLocationKey(const QString cityName)
 {
-    QString url
-            =  "http://dataservice.accuweather.com/locations/v1/cities/autocomplete?apikey="
-            + aw_apiKey
-            + "&q="
-            + aw_city;
+    {
+        aw_locationKey = 0;
 
+        QString url
+                = "http://dataservice.accuweather.com/locations/v1/cities/autocomplete?apikey="
+                + aw_apiKey
+                + "&q="
+                + cityName;
+
+        getData(url);
+
+        if (url == "error")
+        {
+            qDebug() << "error --- getLocationKey";
+            return false;
+        }
+    }
+    {
+        QJsonArray arr = doc.array();
+        {
+            dialog = new QDialog();
+
+            dialog->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+            dialog->setWindowTitle(cityName);
+
+            QVBoxLayout *verticalLayout = new QVBoxLayout(dialog);
+            dialog->setLayout(verticalLayout);
+
+            QLabel *label = new QLabel(cityName, dialog);
+            {
+                label->setFixedHeight(20);
+                label->setAlignment(Qt::AlignHCenter);
+            }
+            verticalLayout->addWidget(label);
+
+            for (const QJsonValue value : arr)
+            {
+                QString key     = value.toObject().value("Key").toString();
+                QString country = value.toObject().value("Country")
+                                       .toObject().value("LocalizedName").toString();
+                QString administrativeArea
+                                = value.toObject().value("AdministrativeArea")
+                                       .toObject().value("LocalizedName").toString();
+
+                aw_countries[country + "(" + administrativeArea + ")"] = key.toInt();
+                {
+                    QPushButton *button = new QPushButton(dialog);
+                    {
+                        button->setText(country + "(" + administrativeArea + ")");
+                        connect(button, SIGNAL(clicked()), this, SLOT(on_pushButton_clicked()));
+                    }
+                    verticalLayout->addWidget(button);
+                }
+            }
+            dialog->exec();
+            dialog->deleteLater();
+        }
+    }
+    return true;
+}
+
+void AccuWeather::on_pushButton_clicked()
+{
+    QPushButton *button = dynamic_cast<QPushButton*>(sender());
+
+    aw_locationKey = aw_countries.find(button->text()).value();
+    button->deleteLater();
+
+    aw_countries.clear();
+
+    dialog->close();
+}
+
+void AccuWeather::getData(QString &url)
+{
     QNetworkAccessManager networkAccessManager;
     QEventLoop            eventLoop;
 
@@ -132,47 +207,11 @@ void AccuWeather::getLocationKey()
     eventLoop.exec();
 
     if (reply->error())
-    {
-        qDebug() << "error getLocationKey";
-    }
+        url = "error";
     else
-    {
-        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-        QJsonArray    arr = doc.array();
+        doc = QJsonDocument::fromJson(reply->readAll());
 
-        for (const QJsonValue value : arr)
-        {
-            QString key     = value.toObject().value("Key").toString();
-            QString country = value.toObject().value("Country")
-                                   .toObject().value("LocalizedName").toString();
-            QString administrativeArea
-                            = value.toObject().value("AdministrativeArea")
-                                   .toObject().value("LocalizedName").toString();
-
-            aw_countries[country + "(" + administrativeArea + ")"] = key.toInt();
-        }
-        {
-            SelectCountry *selectCountry = new SelectCountry;
-
-            selectCountry->setWindowTitle(aw_city);
-            selectCountry->instButtons(aw_countries, aw_city);
-
-            connect(selectCountry, SIGNAL(sendButtonText(const QString)), this, SLOT(getButtonText(const QString)));
-
-            selectCountry->exec();
-
-            delete selectCountry;
-        }
-    }
     reply->deleteLater();
-}
-
-
-
-void AccuWeather::getButtonText(const QString s)
-{
-    aw_locationKey = aw_countries.find(s).value();
-    aw_countries.clear();
 }
 
 void AccuWeather::getDateTime(const QString s)

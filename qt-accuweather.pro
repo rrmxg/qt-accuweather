@@ -19,17 +19,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
 main.cpp \
 gui.cpp \
-#accuweather.cpp \
-#selectcountry.cpp
+#accuweather.cpp
 
 HEADERS += \
 gui.h \
-#accuweather.h \
-#selectcountry.h
+#accuweather.h
 
 FORMS += \
-gui.ui \
-#selectcountry.ui
+gui.ui
 
 include($$PWD\accuweather.pri)
 

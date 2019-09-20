@@ -2,9 +2,7 @@
 QT += network
 
 SOURCES += \
-accuweather.cpp \
-selectcountry.cpp
+accuweather.cpp
 
 HEADERS += \
-accuweather.h \
-selectcountry.h
+accuweather.h
