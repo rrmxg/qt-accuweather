@@ -36,14 +36,16 @@ void GUI::on_pushButton_show_clicked()
         QMap<QDate, WeatherDay>::const_iterator it = weatherDays.constBegin();
         while (it != weatherDays.constEnd())
         {
-            ui->textEdit->append("date            --- " +                 it.key  ().toString()     );
-            ui->textEdit->append("dayOfWeek       --- " +                 it.value().dayOfWeek      );
-            ui->textEdit->append("temperatureMin  --- " + QString::number(it.value().temperatureMin));
-            ui->textEdit->append("temperatureMax  --- " + QString::number(it.value().temperatureMax));
-            ui->textEdit->append("iconDayNo       --- " + QString::number(it.value().iconDayNo     ));
-            ui->textEdit->append("iconPhraseDay   --- " +                 it.value().iconPhraseDay  );
-            ui->textEdit->append("iconNightNo     --- " + QString::number(it.value().iconNightNo   ));
-            ui->textEdit->append("iconPhraseNight --- " +                 it.value().iconPhraseNight);
+            ui->textEdit->append("date             --- " +                 it.key  ().toString()     );
+            ui->textEdit->append("dayOfWeek        --- " +                 it.value().dayOfWeek      );
+            ui->textEdit->append("temperatureMinF  --- " + QString::number(it.value().temperatureMinF));
+            ui->textEdit->append("temperatureMinC  --- " + QString::number(it.value().temperatureMinC));
+            ui->textEdit->append("temperatureMaxF  --- " + QString::number(it.value().temperatureMaxF));
+            ui->textEdit->append("temperatureMaxC  --- " + QString::number(it.value().temperatureMaxC));
+            ui->textEdit->append("iconDayNo        --- " + QString::number(it.value().iconDayNo     ));
+            ui->textEdit->append("iconPhraseDay    --- " +                 it.value().iconPhraseDay  );
+            ui->textEdit->append("iconNightNo      --- " + QString::number(it.value().iconNightNo   ));
+            ui->textEdit->append("iconPhraseNight  --- " +                 it.value().iconPhraseNight);
 
             ui->textEdit->append("\n\n");
 
@@ -60,13 +62,14 @@ void GUI::on_pushButton_show_clicked()
         QMap<QTime, WeatherHour>::const_iterator it = weatherHours.constBegin();
         while (it != weatherHours.constEnd())
         {
-            ui->textEdit->append("times       --- " +                 it.key  ().toString()     );
-            ui->textEdit->append("date        --- " +                 it.value().date.toString());
-            ui->textEdit->append("dayOfWeek   --- " +                 it.value().dayOfWeek      );
-            ui->textEdit->append("isDayNight  --- " + QString::number(it.value().isDayNight    ));
-            ui->textEdit->append("tenperature --- " + QString::number(it.value().temperature   ));
-            ui->textEdit->append("iconNo      --- " + QString::number(it.value().iconNo        ));
-            ui->textEdit->append("iconPhrase  --- " +                 it.value().iconPhrase     );
+            ui->textEdit->append("times        --- " +                 it.key  ().toString()     );
+            ui->textEdit->append("date         --- " +                 it.value().date.toString());
+            ui->textEdit->append("dayOfWeek    --- " +                 it.value().dayOfWeek      );
+            ui->textEdit->append("isDayNight   --- " + QString::number(it.value().isDayNight    ));
+            ui->textEdit->append("temperatureF --- " + QString::number(it.value().temperatureF  ));
+            ui->textEdit->append("temperatureC --- " + QString::number(it.value().temperatureC  ));
+            ui->textEdit->append("iconNo       --- " + QString::number(it.value().iconNo        ));
+            ui->textEdit->append("iconPhrase   --- " +                 it.value().iconPhrase     );
 
             ui->textEdit->append("\n\n");
 

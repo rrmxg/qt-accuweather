@@ -10,21 +10,21 @@ SelectCountry::SelectCountry(QWidget *parent) :
     QDialog(parent, Qt::Window | Qt::FramelessWindowHint) { }
 
 
-void SelectCountry::instButtons(const QMap<QString, int> _countries,
-                                const QString            _cityName)
+void SelectCountry::instButtons(const QMap<QString, int> countries,
+                                const QString            cityName)
 {
     QVBoxLayout *verticalLayout = new QVBoxLayout(this);
     setLayout(verticalLayout);
 
-    QLabel *label = new QLabel(_cityName, this);
+    QLabel *label = new QLabel(cityName, this);
     {
         label->setFixedHeight(20);
         label->setAlignment(Qt::AlignHCenter);
     }
     verticalLayout->addWidget(label);
 
-    QMap<QString, int>::const_iterator it = _countries.constBegin();
-    while (it != _countries.constEnd())
+    QMap<QString, int>::const_iterator it = countries.constBegin();
+    while (it != countries.constEnd())
     {
         QPushButton *button = new QPushButton(this);
         {

@@ -1,6 +1,6 @@
 #include "accuweather.h"
 
-void AccuWeather::getData(QMap<QDate, WeatherDay> &_weatherDays)
+void AccuWeather::getData(QMap<QDate, WeatherDay> &weatherDays)
 {
     getLocationKey();
 
@@ -38,12 +38,14 @@ void AccuWeather::getData(QMap<QDate, WeatherDay> &_weatherDays)
             getDateTime(value.toObject().value("Date").toString());
 
             weatherDay.dayOfWeek       = QLocale().dayName(aw_date.dayOfWeek());
-            weatherDay.temperatureMin  = value.toObject().value("Temperature")
+            weatherDay.temperatureMinF = value.toObject().value("Temperature")
                                               .toObject().value("Minimum")
                                               .toObject().value("Value").toInt();
-            weatherDay.temperatureMax  = value.toObject().value("Temperature")
+            weatherDay.temperatureMinC = fToC(weatherDay.temperatureMinF);
+            weatherDay.temperatureMaxF = value.toObject().value("Temperature")
                                               .toObject().value("Maximum")
                                               .toObject().value("Value").toInt();
+            weatherDay.temperatureMaxC = fToC(weatherDay.temperatureMaxF);
             weatherDay.iconDayNo       = value.toObject().value("Day")
                                               .toObject().value("Icon").toInt();
             weatherDay.iconPhraseDay   = value.toObject().value("Day")
@@ -53,14 +55,14 @@ void AccuWeather::getData(QMap<QDate, WeatherDay> &_weatherDays)
             weatherDay.iconPhraseNight = value.toObject().value("Night")
                                               .toObject().value("IconPhrase").toString();
 
-            _weatherDays[aw_date] = weatherDay;
+            weatherDays[aw_date] = weatherDay;
         }
     }
     reply->deleteLater();
 }
 
 
-void AccuWeather::getData(QMap<QTime, WeatherHour> &_weatherHours)
+void AccuWeather::getData(QMap<QTime, WeatherHour> &weatherHours)
 {
     getLocationKey();
 
@@ -96,15 +98,16 @@ void AccuWeather::getData(QMap<QTime, WeatherHour> &_weatherHours)
 
             getDateTime(value.toObject().value("DateTime").toString());
 
-            weatherHour.date        = aw_date;
-            weatherHour.dayOfWeek   = QLocale().dayName(aw_date.dayOfWeek());
-            weatherHour.iconNo      = value.toObject().value("WeatherIcon").toInt();
-            weatherHour.iconPhrase  = value.toObject().value("IconPhrase").toString();
-            weatherHour.isDayNight  = value.toObject().value("IsDaylight").toBool();
-            weatherHour.temperature = value.toObject().value("Temperature")
-                                              .toObject().value("Value").toInt();
+            weatherHour.date         = aw_date;
+            weatherHour.dayOfWeek    = QLocale().dayName(aw_date.dayOfWeek());
+            weatherHour.iconNo       = value.toObject().value("WeatherIcon").toInt();
+            weatherHour.iconPhrase   = value.toObject().value("IconPhrase").toString();
+            weatherHour.isDayNight   = value.toObject().value("IsDaylight").toBool();
+            weatherHour.temperatureF = value.toObject().value("Temperature")
+                                            .toObject().value("Value").toInt();
+            weatherHour.temperatureC = fToC(weatherHour.temperatureF);
 
-            _weatherHours[aw_time] = weatherHour;
+            weatherHours[aw_time] = weatherHour;
         }
     }
     reply->deleteLater();
@@ -166,25 +169,21 @@ void AccuWeather::getLocationKey()
 
 
 
-void AccuWeather::getButtonText(const QString _s)
+void AccuWeather::getButtonText(const QString s)
 {
-    aw_locationKey = aw_countries.find(_s).value();
+    aw_locationKey = aw_countries.find(s).value();
     aw_countries.clear();
 }
 
-void AccuWeather::getDateTime(const QString _date)
+void AccuWeather::getDateTime(const QString s)
 {
     // yyyy-mm-ddThh:mm:ss+hh:mm;
 
-    QString d{};
-    for (int i =  0; i < 10; i++)
-        d += _date[i];
+    aw_date = QDate::fromString(s.left(10), "yyyy-MM-dd");
+    aw_time = QTime::fromString(s.mid(11, 8), "HH:mm:ss");
+}
 
-    aw_date = QDate::fromString(d, "yyyy-MM-dd");
-
-    QString t{};
-    for (int i = 11; i < 19; i++)
-        t += _date[i];
-
-    aw_time = QTime::fromString(t, "HH:mm:ss");
+int AccuWeather::fToC(const int t)
+{
+    return (t - 32) * 5 / 9;
 }

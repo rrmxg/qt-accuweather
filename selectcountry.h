@@ -14,8 +14,8 @@ public:
     explicit SelectCountry(QWidget *parent = nullptr);
     ~SelectCountry() {}
 
-    void instButtons(const QMap<QString, int> _countries,
-                     const QString            _cityName);
+    void instButtons(const QMap<QString, int> countries,
+                     const QString            cityName);
 
 private slots:
     void on_pushButton_clicked();
