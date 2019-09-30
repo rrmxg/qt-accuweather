@@ -1,103 +1,53 @@
 #ifndef ACCUWEATHER_WEATHER_H
 #define ACCUWEATHER_WEATHER_H
-
+///////////////////////////////////////////////////////////////////////////////
+#include "forecastdata.h"
+///////////////////////////////////////////////////////////////////////////////
 #include <QJsonDocument>
 #include <QDate>
 #include <QObject>
-#include <QDialog>
-#include <QMap>
-
+#include <QVector>
 ///////////////////////////////////////////////////////////////////////////////
+
 const QString ACCUWEATHER = "AccuWeather";
-///////////////////////////////////////////////////////////////////////////////
 
-/// = "1day",
-///   "5day",
-///   "10day",
-///   "15day"
-const QStringList FORECASTS_DAYS =
-{
-    "1day",    // 0
-    "5day",    // 1
-    "10day",   // 2 -
-    "15day"    // 3 -
-};
-///////////////////////////////////////////////////////////////////////////////
+const QString DAILY  = "daily" ;
+const QString HOURLY = "hourly";
 
-/// = "1hour",
-///   "12hour",
-///   "24hour",
-///   "72hour",
-///   "120hour"
-const QStringList FORECASTS_HOURS =
-{
-    "1hour",   // 0
-    "12hour",  // 1
-    "24hour",  // 2 -
-    "72hour",  // 3 -
-    "120hour"  // 4 -
-};
-///////////////////////////////////////////////////////////////////////////////
-struct WeatherHour
-{
-    QDate   date        ;
-    QString dayOfWeek   ;
-    int     iconNo      ;
-    QString iconPhrase  ;
-    bool    isDayNight  ;
-    int     temperatureF;
-    int     temperatureC;
-};
-struct WeatherDay
-{
-    QString dayOfWeek      ;
-    int     temperatureMinF;
-    int     temperatureMaxF;
-    int     temperatureMinC;
-    int     temperatureMaxC;
-    int     iconDayNo      ;
-    QString iconPhraseDay  ;
-    int     iconNightNo    ;
-    QString iconPhraseNight;
-};
-///////////////////////////////////////////////////////////////////////////////
 class AccuWeather : public QObject
 {
     Q_OBJECT
 
 public:
-    AccuWeather(const QString apiKey) : aw_apiKey(apiKey) {}
-    ~AccuWeather() {}
+    AccuWeather () {}
+    AccuWeather (const QString apiKey) : aw_apiKey(apiKey) {}
+    ~AccuWeather();
 
-    bool getForecast(const QString forecastType,
-                           QMap<QDate, WeatherDay> &weatherDays);
+    void setApiKey(const QString apikey) { aw_apiKey = apikey; }
 
-    bool getForecast(const QString forecastType,
-                           QMap<QTime, WeatherHour> &weatherHour);
+    bool getCountriesList(const QString cityName,
+                                QMap<QString, int> &countries);
 
-    bool getLocationKey(const QString cityName);  // LocationsAPI -> AutocompleteSearch
+    QVector<ForecastData> forecastData;
 
-private slots:
-    void on_pushButton_clicked();
+    bool getForecast(const int     locationKey,
+                     const QString forecastType);
+
+    ForecastData searchForecast(const QDate);
+    ForecastData searchForecast(const QTime);
 
 private:
-    void getData       (      QString&);
-    void getDateTime   (const QString );
+    void getForecastDay ();
+    void getForecastHour();
 
-    int fToC(const int t); // Fahrenheit to Celsius
+    void getData(QString&);
 
-    QDialog *dialog;
+    QDate getDate(const QString);
+    QTime getTime(const QString);
 
     QJsonDocument doc;
 
     QString aw_apiKey{};
-
-    int aw_locationKey{};
-
-    QDate aw_date{};
-    QTime aw_time{};
-
-    QMap<QString, int> aw_countries{};
 };
 
 #endif // ACCUWEATHER_WEATHER_H

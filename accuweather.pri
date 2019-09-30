@@ -2,7 +2,9 @@
 QT += network
 
 SOURCES += \
-accuweather.cpp
+$$PWD/forecastdata.cpp \
+$$PWD/accuweather.cpp
 
 HEADERS += \
-accuweather.h
+$$PWD/forecastdata.h \
+$$PWD/accuweather.h
