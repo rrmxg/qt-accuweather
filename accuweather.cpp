@@ -1,17 +1,17 @@
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include "accuweather.h"
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include <QDebug>
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QNetworkReply>
 #include <QEventLoop>
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 #include <QPushButton>
 #include <QLabel>
 #include <QVBoxLayout>
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 
 AccuWeather::~AccuWeather() { forecastData.clear(); }
 
@@ -67,7 +67,7 @@ void AccuWeather::getForecastDay()
 {
     forecastData.clear();
 
-    QJsonObject obj = doc.object();
+    QJsonObject obj = aw_doc.object();
     QJsonArray  arr = obj.value("DailyForecasts").toArray();
 
     ForecastData fd;
@@ -109,7 +109,7 @@ void AccuWeather::getForecastHour()
 {
     forecastData.clear();
 
-    QJsonArray arr = doc.array();
+    QJsonArray arr = aw_doc.array();
 
     ForecastData fd;
 
@@ -154,7 +154,7 @@ bool AccuWeather::getCountriesList(const QString cityName,
         return false;
     }
 
-    QJsonArray arr = doc.array();
+    QJsonArray arr = aw_doc.array();
 
     for (const QJsonValue value : arr)
     {
